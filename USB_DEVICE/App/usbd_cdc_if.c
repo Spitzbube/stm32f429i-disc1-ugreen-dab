@@ -32,6 +32,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+static uint8_t uartcfg[7] = {0,0,0,0,0,0,0};
 
 /* USER CODE END PV */
 
@@ -226,10 +227,24 @@ static int8_t CDC_Control_HS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
   case CDC_SET_LINE_CODING:
+    	uartcfg[0] = pbuf[0];
+    	uartcfg[1] = pbuf[1];
+    	uartcfg[2] = pbuf[2];
+    	uartcfg[3] = pbuf[3];
+    	uartcfg[4] = pbuf[4];
+    	uartcfg[5] = pbuf[5];
+    	uartcfg[6] = pbuf[6];
 
     break;
 
   case CDC_GET_LINE_CODING:
+    	pbuf[0] = uartcfg[0];
+    	pbuf[1] = uartcfg[1];
+    	pbuf[2] = uartcfg[2];
+    	pbuf[3] = uartcfg[3];
+    	pbuf[4] = uartcfg[4];
+    	pbuf[5] = uartcfg[5];
+    	pbuf[6] = uartcfg[6];
 
     break;
 

@@ -46,6 +46,7 @@ SPI_HandleTypeDef hspi3;
 
 osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
+TaskHandle_t si46xxTaskHandle;
 
 /* USER CODE END PV */
 
@@ -95,22 +96,6 @@ int main(void)
   MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
 
-  char strVersion[20];
-
-#if 0
-  si46xx_start_dab(0, 0);
-
-  si46xx_get_func_info(strVersion);
-#endif
-
-  si46xx_start_fm(0);
-
-  si46xx_get_func_info(strVersion);
-
-//  si46xx_fm_tune_freq(10240);
-  si46xx_fm_tune_freq(10530);
-  si46xx_set_volume(48);
-
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -136,6 +121,8 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  extern void si46xx_task(void*);
+  xTaskCreate(si46xx_task, "Si46xxTask", configMINIMAL_STACK_SIZE, NULL, 1, &si46xxTaskHandle);
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
@@ -311,8 +298,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : B1_Pin MEMS_INT1_Pin MEMS_INT2_Pin TP_INT1_Pin */
-  GPIO_InitStruct.Pin = B1_Pin|MEMS_INT1_Pin|MEMS_INT2_Pin|TP_INT1_Pin;
+  /*Configure GPIO pin : B1_Pin */
+  GPIO_InitStruct.Pin = B1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : MEMS_INT1_Pin MEMS_INT2_Pin TP_INT1_Pin */
+  GPIO_InitStruct.Pin = MEMS_INT1_Pin|MEMS_INT2_Pin|TP_INT1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_EVT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -423,6 +416,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : PC8 */
+  GPIO_InitStruct.Pin = GPIO_PIN_8;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
   /*Configure GPIO pin : I2C3_SDA_Pin */
   GPIO_InitStruct.Pin = I2C3_SDA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
@@ -478,6 +477,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF12_FMC;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
 }
 
 /* USER CODE BEGIN 4 */
@@ -488,13 +494,30 @@ int _write(int file, char *ptr, int len)
 
    uint8_t rc = USBD_OK;
 
-//   do
+   do
    {
       rc = CDC_Transmit_HS((uint8_t*) ptr, len);
    }
-//   while (USBD_BUSY == rc);
+   while (USBD_BUSY == rc);
 
    return len;
+}
+
+void App_EXTI_IRQHandler(void)
+{
+	BaseType_t xYieldRequired = pdFALSE;
+
+	if ((EXTI->PR & EXTI_PR_PR0) == EXTI_PR_PR0)
+	{
+		if (defaultTaskHandle != NULL)
+		{
+			xYieldRequired = xTaskResumeFromISR(defaultTaskHandle);
+			if (xYieldRequired == pdTRUE)
+			{
+				portYIELD_FROM_ISR(defaultTaskHandle);
+			}
+		}
+	}
 }
 
 /* USER CODE END 4 */
@@ -511,25 +534,19 @@ void StartDefaultTask(void const * argument)
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
+  vTaskSuspend(NULL); //wait for EXTI_0
+
+  if (si46xxTaskHandle != NULL)
+  {
+	  vTaskResume(si46xxTaskHandle);
+  }
+
   /* Infinite loop */
   for(;;)
   {
-	  if (0 == si46xx_get_fm_received_signal_quality())
-	  {
-          int8_t rssi = si46xx_buffer[9]; //RSSI
-          int8_t snr = si46xx_buffer[10]; //SNR
-          uint8_t multipath = si46xx_buffer[11]; //MULT
-          uint32_t freq = si46xx_buffer[6]; //READFREQ
-          freq |= (si46xx_buffer[7] << 8); //READFREQ
-          uint8_t freq_offset = si46xx_buffer[8]; //FREQOFF
-
-          printf("FM(%u): rssi=%d, snr=%d, multipath=%d \r\n", freq, rssi, snr, multipath);
-	  }
-
 	  HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 
-//	  osDelay(1000);
-	  HAL_Delay(1000);
+	  osDelay(1000);
   }
   /* USER CODE END 5 */
 }

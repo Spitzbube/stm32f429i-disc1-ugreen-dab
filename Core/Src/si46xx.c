@@ -1,6 +1,8 @@
 
+#include <stdio.h>
 #include <string.h>
 #include "main.h"
+#include "cmsis_os.h"
 
 extern const uint8_t fw_rom00_patch016[5796];
 extern const uint8_t fw_dab_radio_5_0_5[521448];
@@ -19,6 +21,7 @@ uint8_t si46xx_buffer[2048];
 #define SI46XX_SET_PROPERTY                  0x13
 #define SI46XX_FM_TUNE_FREQ                  0x30
 #define SI46XX_FM_RSQ_STATUS                 0x32
+#define SI46XX_FM_RDS_STATUS                 0x34
 
 #define SI46XX_FM_INT_CTL_ENABLE             0x0000
 #define SI46XX_DIGITAL_IO_OUTPUT_SELECT      0x0200
@@ -592,13 +595,11 @@ static int si46xx_set_config(void)
    }
 #endif
 
-#if 0
    if (0 != si46xx_set_property(SI46XX_FM_INT_CTL_ENABLE,
                 (1 << 2)/*RDSIEN (Interrupt when RDSINT is set)*/))
    {
       return 1;
    }
-#endif
 
    return 0;
 }
@@ -726,5 +727,109 @@ int si46xx_get_func_info(char* a)
 
    return 0;
 }
+
+
+int si46xx_get_fm_rds_status(uint8_t arg1, uint8_t retry)
+{
+   uint8_t i = 0;
+
+   do
+   {
+      si46xx_buffer[0] = SI46XX_FM_RDS_STATUS;
+      si46xx_buffer[1] = arg1 & 0x07; //STATUSONLY MTFIFO INTACK
+
+      if (0 != si46xx_send_command(2, 20, 1))
+      {
+         return 1;
+      }
+
+      i++;
+   }
+   while (((si46xx_buffer[5] & (1 << 1)/*RDSSYNC*/) == 0) && (i < retry));
+
+   if (i == retry)
+   {
+      return 1;
+   }
+
+   for (i = 6; i < 20; i++)
+   {
+	   printf("RDS: si46xx_buffer[%d] = 0x%02x\r\n", i, si46xx_buffer[i]);
+   }
+
+   return 0;
+}
+
+
+static TaskHandle_t irqTaskHandle;
+
+
+void si46xx_handle_interrupt(void)
+{
+	BaseType_t xYieldRequired = pdFALSE;
+
+	if (irqTaskHandle != NULL)
+	{
+		xYieldRequired = xTaskResumeFromISR(irqTaskHandle);
+		if (xYieldRequired == pdTRUE)
+		{
+			portYIELD_FROM_ISR(irqTaskHandle);
+		}
+	}
+}
+
+
+void si46xx_interrupt_task(void* pTaskData)
+{
+	while (1)
+	{
+		vTaskSuspend(NULL); //wait for Interrupt
+
+		if (0 == si46xx_read_reply(0, 4))
+		{
+			if ((si46xx_buffer[0] & (1 << 2)/*RDSINT*/) != 0)
+			{
+				if (0 == si46xx_get_fm_rds_status(1/*INTACK*/, 2))
+				{
+				}
+			}
+		}
+	}
+}
+
+
+void si46xx_task(void* pTaskData)
+{
+	vTaskSuspend(NULL); //wait for Startup
+
+	xTaskCreate(si46xx_interrupt_task, "Si46xxIrqTask", configMINIMAL_STACK_SIZE, NULL, 1, &irqTaskHandle);
+
+//	si46xx_start_dab(0, 0);
+	si46xx_start_fm(0);
+
+//  si46xx_fm_tune_freq(10240);
+	si46xx_fm_tune_freq(10530);
+	si46xx_set_volume(48);
+
+	while (1)
+	{
+		if (0 == si46xx_get_fm_received_signal_quality())
+		{
+			int8_t rssi = si46xx_buffer[9]; //RSSI
+			int8_t snr = si46xx_buffer[10]; //SNR
+			uint8_t multipath = si46xx_buffer[11]; //MULT
+			uint32_t freq = si46xx_buffer[6]; //READFREQ
+			freq |= (si46xx_buffer[7] << 8); //READFREQ
+			uint8_t freq_offset = si46xx_buffer[8]; //FREQOFF
+
+			printf("FM(%u): rssi=%d, snr=%d, multipath=%d \r\n", freq, rssi, snr, multipath);
+		}
+
+		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
+
+		osDelay(1000);
+	}
+}
+
 
 
