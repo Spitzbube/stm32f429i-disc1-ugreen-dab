@@ -173,15 +173,6 @@ typedef enum
 #define I2Cx_TIMEOUT_MAX                    0x3000 /*<! The value of the maximal timeout for I2C waiting loops */
 
 /*############################### SPIx #######################################*/
-#define DISCOVERY_SPIx                          SPI5
-#define DISCOVERY_SPIx_CLK_ENABLE()             __HAL_RCC_SPI5_CLK_ENABLE()
-#define DISCOVERY_SPIx_GPIO_PORT                GPIOF                      /* GPIOF */
-#define DISCOVERY_SPIx_AF                       GPIO_AF5_SPI5
-#define DISCOVERY_SPIx_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOF_CLK_ENABLE()
-#define DISCOVERY_SPIx_GPIO_CLK_DISABLE()       __HAL_RCC_GPIOF_CLK_DISABLE()
-#define DISCOVERY_SPIx_SCK_PIN                  GPIO_PIN_7                 /* PF.07 */
-#define DISCOVERY_SPIx_MISO_PIN                 GPIO_PIN_8                 /* PF.08 */
-#define DISCOVERY_SPIx_MOSI_PIN                 GPIO_PIN_9                 /* PF.09 */
 /* Maximum Timeout values for flags waiting loops. These timeouts are not based
    on accurate values, they just guarantee that the application will not remain
    stuck if the SPI communication is corrupted.

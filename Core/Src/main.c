@@ -136,7 +136,7 @@ int main(void)
   /* Clear the LCD */
   BSP_LCD_Clear(LCD_COLOR_WHITE);
 
-  BSP_LCD_DrawHLine(50, 100, 75);
+  BSP_LCD_DrawHLine(50, 100, 150);
 
   /* USER CODE END 2 */
 
@@ -567,7 +567,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, NCS_MEMS_SPI_Pin|LCD_NCS_Pin|OTG_FS_PSO_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, NCS_MEMS_SPI_Pin|OTG_FS_PSO_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LCD_NCS_GPIO_Port, LCD_NCS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(ACP_RST_GPIO_Port, ACP_RST_Pin, GPIO_PIN_RESET);

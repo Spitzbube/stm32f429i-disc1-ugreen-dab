@@ -86,7 +86,12 @@ uint32_t SpixTimeout = SPIx_TIMEOUT_MAX; /*<! Value of Timeout when SPI communic
 #if 0
 I2C_HandleTypeDef I2cHandle;
 #endif
+#if 0
 static SPI_HandleTypeDef SpiHandle;
+#else
+extern SPI_HandleTypeDef hspi5;
+#define SpiHandle hspi5
+#endif
 static uint8_t Is_LCD_IO_Initialized = 0;
 
 /**
@@ -119,7 +124,6 @@ static void               SPIx_Write(uint16_t Value);
 static uint32_t           SPIx_Read(uint8_t ReadSize);
 static uint8_t            SPIx_WriteRead(uint8_t Byte);
 static void               SPIx_Error(void);
-static void               SPIx_MspInit(SPI_HandleTypeDef *hspi);
 
 /* Link function for LCD peripheral */
 void                      LCD_IO_Init(void);
@@ -622,6 +626,7 @@ static void I2Cx_Error(void)
   */
 static void SPIx_Init(void)
 {
+#if 0
   if(HAL_SPI_GetState(&SpiHandle) == HAL_SPI_STATE_RESET)
   {
     /* SPI configuration -----------------------------------------------------*/
@@ -651,6 +656,7 @@ static void SPIx_Init(void)
     SPIx_MspInit(&SpiHandle);
     HAL_SPI_Init(&SpiHandle);
   }
+#endif
 }
 
 /**
@@ -723,29 +729,6 @@ static void SPIx_Error(void)
 
   /* Re- Initialize the SPI communication BUS */
   SPIx_Init();
-}
-
-/**
-  * @brief  SPI MSP Init.
-  * @param  hspi: SPI handle
-  */
-static void SPIx_MspInit(SPI_HandleTypeDef *hspi)
-{
-  GPIO_InitTypeDef   GPIO_InitStructure;
-
-  /* Enable SPIx clock */
-  DISCOVERY_SPIx_CLK_ENABLE();
-
-  /* Enable DISCOVERY_SPI GPIO clock */
-  DISCOVERY_SPIx_GPIO_CLK_ENABLE();
-
-  /* configure SPI SCK, MOSI and MISO */
-  GPIO_InitStructure.Pin    = (DISCOVERY_SPIx_SCK_PIN | DISCOVERY_SPIx_MOSI_PIN | DISCOVERY_SPIx_MISO_PIN);
-  GPIO_InitStructure.Mode   = GPIO_MODE_AF_PP;
-  GPIO_InitStructure.Pull   = GPIO_PULLDOWN;
-  GPIO_InitStructure.Speed  = GPIO_SPEED_MEDIUM;
-  GPIO_InitStructure.Alternate = DISCOVERY_SPIx_AF;
-  HAL_GPIO_Init(DISCOVERY_SPIx_GPIO_PORT, &GPIO_InitStructure);
 }
 
 /********************************* LINK LCD ***********************************/
