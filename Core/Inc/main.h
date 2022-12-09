@@ -93,8 +93,8 @@ void Error_Handler(void);
 #define SDNWE_GPIO_Port GPIOC
 #define NCS_MEMS_SPI_Pin GPIO_PIN_1
 #define NCS_MEMS_SPI_GPIO_Port GPIOC
-#define CSX_Pin GPIO_PIN_2
-#define CSX_GPIO_Port GPIOC
+#define LCD_NCS_Pin GPIO_PIN_2
+#define LCD_NCS_GPIO_Port GPIOC
 #define B1_Pin GPIO_PIN_0
 #define B1_GPIO_Port GPIOA
 #define B1_EXTI_IRQn EXTI0_IRQn
@@ -173,10 +173,10 @@ void Error_Handler(void);
 #define D15_GPIO_Port GPIOD
 #define TE_Pin GPIO_PIN_11
 #define TE_GPIO_Port GPIOD
-#define RDX_Pin GPIO_PIN_12
-#define RDX_GPIO_Port GPIOD
-#define WRX_DCX_Pin GPIO_PIN_13
-#define WRX_DCX_GPIO_Port GPIOD
+#define LCD_RDX_Pin GPIO_PIN_12
+#define LCD_RDX_GPIO_Port GPIOD
+#define LCD_WRX_Pin GPIO_PIN_13
+#define LCD_WRX_GPIO_Port GPIOD
 #define D0_Pin GPIO_PIN_14
 #define D0_GPIO_Port GPIOD
 #define D1_Pin GPIO_PIN_15

@@ -755,36 +755,9 @@ static void SPIx_MspInit(SPI_HandleTypeDef *hspi)
   */
 void LCD_IO_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStructure;
-
   if(Is_LCD_IO_Initialized == 0)
   {
     Is_LCD_IO_Initialized = 1;
-
-    /* Configure NCS in Output Push-Pull mode */
-    LCD_WRX_GPIO_CLK_ENABLE();
-    GPIO_InitStructure.Pin     = LCD_WRX_PIN;
-    GPIO_InitStructure.Mode    = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStructure.Pull    = GPIO_NOPULL;
-    GPIO_InitStructure.Speed   = GPIO_SPEED_FAST;
-    HAL_GPIO_Init(LCD_WRX_GPIO_PORT, &GPIO_InitStructure);
-
-    LCD_RDX_GPIO_CLK_ENABLE();
-    GPIO_InitStructure.Pin     = LCD_RDX_PIN;
-    GPIO_InitStructure.Mode    = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStructure.Pull    = GPIO_NOPULL;
-    GPIO_InitStructure.Speed   = GPIO_SPEED_FAST;
-    HAL_GPIO_Init(LCD_RDX_GPIO_PORT, &GPIO_InitStructure);
-
-    /* Configure the LCD Control pins ----------------------------------------*/
-    LCD_NCS_GPIO_CLK_ENABLE();
-
-    /* Configure NCS in Output Push-Pull mode */
-    GPIO_InitStructure.Pin     = LCD_NCS_PIN;
-    GPIO_InitStructure.Mode    = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStructure.Pull    = GPIO_NOPULL;
-    GPIO_InitStructure.Speed   = GPIO_SPEED_FAST;
-    HAL_GPIO_Init(LCD_NCS_GPIO_PORT, &GPIO_InitStructure);
 
     /* Set or Reset the control line */
     LCD_CS_LOW();
