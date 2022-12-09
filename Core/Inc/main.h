@@ -77,8 +77,6 @@ void Error_Handler(void);
 #define A4_GPIO_Port GPIOF
 #define A5_Pin GPIO_PIN_5
 #define A5_GPIO_Port GPIOF
-#define Display_CS_Pin GPIO_PIN_6
-#define Display_CS_GPIO_Port GPIOF
 #define SPI5_SCK_Pin GPIO_PIN_7
 #define SPI5_SCK_GPIO_Port GPIOF
 #define SPI5_MISO_Pin GPIO_PIN_8
@@ -97,8 +95,6 @@ void Error_Handler(void);
 #define NCS_MEMS_SPI_GPIO_Port GPIOC
 #define CSX_Pin GPIO_PIN_2
 #define CSX_GPIO_Port GPIOC
-#define Display_Reset_Pin GPIO_PIN_3
-#define Display_Reset_GPIO_Port GPIOC
 #define B1_Pin GPIO_PIN_0
 #define B1_GPIO_Port GPIOA
 #define B1_EXTI_IRQn EXTI0_IRQn
@@ -185,8 +181,6 @@ void Error_Handler(void);
 #define D0_GPIO_Port GPIOD
 #define D1_Pin GPIO_PIN_15
 #define D1_GPIO_Port GPIOD
-#define Display_DC_Pin GPIO_PIN_2
-#define Display_DC_GPIO_Port GPIOG
 #define BA0_Pin GPIO_PIN_4
 #define BA0_GPIO_Port GPIOG
 #define BA1_Pin GPIO_PIN_5
