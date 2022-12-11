@@ -134,7 +134,7 @@ int main(void)
   BSP_LCD_DisplayOn();
 
   /* Clear the LCD */
-  BSP_LCD_Clear(LCD_COLOR_WHITE);
+  BSP_LCD_Clear(LCD_COLOR_LIGHTBLUE);
 
   BSP_LCD_DrawHLine(50, 100, 150);
 
@@ -281,20 +281,40 @@ static void MX_LTDC_Init(void)
 
   /* USER CODE BEGIN LTDC_Init 1 */
 
+#define TFT_HSYNC		0x7
+#define TFT_HBP			0x12
+#define TFT_HAWIDTH	0x140
+#define TFT_HFP			0x10
+
+#define TFT_VSYNC		0x2
+#define TFT_VBP			0x8
+#define TFT_VAWIDTH	0x140
+#define TFT_VFP			0x04
+
+#define HSW				(TFT_HSYNC - 1)
+#define AHBP 			(TFT_HSYNC + TFT_HBP -1)
+#define AAW 				(TFT_HSYNC + TFT_HBP + TFT_HAWIDTH - 1)
+#define TOTALW 			(TFT_HSYNC + TFT_HBP + TFT_HAWIDTH + TFT_HFP - 1)
+
+#define VSH 				(TFT_VSYNC - 1)
+#define AVPB 			(TFT_VSYNC + TFT_VBP - 1)
+#define AAH  			(TFT_VSYNC + TFT_VBP + TFT_VAWIDTH - 1)
+#define TOTALH 			(TFT_VSYNC + TFT_VBP + TFT_VAWIDTH + TFT_VFP - 1)
+
   /* USER CODE END LTDC_Init 1 */
   hltdc.Instance = LTDC;
   hltdc.Init.HSPolarity = LTDC_HSPOLARITY_AL;
   hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AL;
   hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AL;
   hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IPC;
-  hltdc.Init.HorizontalSync = 9;
-  hltdc.Init.VerticalSync = 1;
-  hltdc.Init.AccumulatedHBP = 29;
-  hltdc.Init.AccumulatedVBP = 3;
-  hltdc.Init.AccumulatedActiveW = 269;
-  hltdc.Init.AccumulatedActiveH = 323;
-  hltdc.Init.TotalWidth = 279;
-  hltdc.Init.TotalHeigh = 327;
+  hltdc.Init.HorizontalSync = HSW; //9;
+  hltdc.Init.VerticalSync = VSH; //1;
+  hltdc.Init.AccumulatedHBP = AHBP; //29;
+  hltdc.Init.AccumulatedVBP = AVPB; //3;
+  hltdc.Init.AccumulatedActiveW = AAW; //269;
+  hltdc.Init.AccumulatedActiveH = AAH; //323;
+  hltdc.Init.TotalWidth = TOTALW; //279;
+  hltdc.Init.TotalHeigh = TOTALH; //327;
   hltdc.Init.Backcolor.Blue = 0;
   hltdc.Init.Backcolor.Green = 0;
   hltdc.Init.Backcolor.Red = 0;
@@ -303,17 +323,17 @@ static void MX_LTDC_Init(void)
     Error_Handler();
   }
   pLayerCfg.WindowX0 = 0;
-  pLayerCfg.WindowX1 = 240;
+  pLayerCfg.WindowX1 = 320; //240;
   pLayerCfg.WindowY0 = 0;
-  pLayerCfg.WindowY1 = 320;
+  pLayerCfg.WindowY1 = 240; //320;
   pLayerCfg.PixelFormat = LTDC_PIXEL_FORMAT_ARGB8888;
   pLayerCfg.Alpha = 255;
   pLayerCfg.Alpha0 = 0;
   pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA;
   pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA;
   pLayerCfg.FBStartAdress = 0xD0000000;
-  pLayerCfg.ImageWidth = 240;
-  pLayerCfg.ImageHeight = 320;
+  pLayerCfg.ImageWidth = 320; //240;
+  pLayerCfg.ImageHeight = 240; //320;
   pLayerCfg.Backcolor.Blue = 0;
   pLayerCfg.Backcolor.Green = 0;
   pLayerCfg.Backcolor.Red = 0;

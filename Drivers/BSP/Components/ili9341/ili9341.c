@@ -122,6 +122,7 @@ void ili9341_Init(void)
   LCD_IO_Init();
 
   /* Configure LCD */
+#if 0
   ili9341_WriteReg(0xCA);
   ili9341_WriteData(0xC3);
   ili9341_WriteData(0x08);
@@ -238,6 +239,81 @@ void ili9341_Init(void)
   ili9341_WriteReg(LCD_DISPLAY_ON);
   /* GRAM start writing */
   ili9341_WriteReg(LCD_GRAM);
+#else
+  // software reset
+    ili9341_WriteReg(LCD_SWRESET);
+
+    // display out of sleep mode
+    ili9341_WriteReg(LCD_SLEEP_OUT);
+
+    ili9341_WriteReg(LCD_RGB_INTERFACE); // RGB Interface Signal Control
+    ili9341_WriteData(0xC0); // ByPass_MODE = 1, RCM [1:0] = "10" (RGB Mode = DE mode)
+
+    ili9341_WriteReg(LCD_INTERFACE);
+    ili9341_WriteData(0x01); // WEMODE = 0 => avoid white triangles
+    ili9341_WriteData(0x00);
+    ili9341_WriteData(0x02); //RM = 1 (Interface for RAM Access = RGB interface)
+
+    // set memory access control
+    ili9341_WriteReg(LCD_MAC);
+    // Next EVB Top view, USB-LINK is on the right
+    //ili9341_WriteData(0x68);
+    // Next EVB Top view, USB-LINK is on the left
+    // Must also modify touchpad file to match this new position
+    ili9341_WriteData(0xA8);
+
+    // Column address set
+    ili9341_WriteReg(LCD_COLUMN_ADDR);
+    ili9341_WriteData(0x00);
+    ili9341_WriteData(0x00);
+    ili9341_WriteData(0x01);
+    ili9341_WriteData(0x40);
+
+    // Page address set
+    // Makes height on screen to 240 in landscape
+    ili9341_WriteReg(LCD_PAGE_ADDR);
+    ili9341_WriteData(0x00);
+    ili9341_WriteData(0x00);
+    ili9341_WriteData(0x00);
+    ili9341_WriteData(0xF0);
+
+    // set frame rate control
+    ili9341_WriteReg(LCD_FRMCTR1);
+    ili9341_WriteData(0x00);
+    ili9341_WriteData(0x1B);
+
+    ili9341_WriteReg(LCD_WRITE_MEM_CONTINUE);
+    ili9341_WriteData(0x10);
+    ili9341_WriteData(0x10);
+    ili9341_WriteData(0x10);
+
+    // set display function control
+    ili9341_WriteReg(LCD_DFC);
+    ili9341_WriteData(0x0A);
+    ili9341_WriteData(0xA7);
+    ili9341_WriteData(0x27);
+    ili9341_WriteData(0x04);
+
+    // select pixel data format
+    ili9341_WriteReg(LCD_PIXEL_FORMAT);
+    ili9341_WriteData(0x66);
+
+    // configure RGB interface
+    ili9341_WriteReg(LCD_RGB_INTERFACE);
+    ili9341_WriteData(0xC2);
+
+    // enable display
+    ili9341_WriteReg(LCD_DISPLAY_ON);
+
+    // delay
+    HAL_Delay(120);
+
+    // select RGB interface
+    ili9341_WriteReg(LCD_INTERFACE);
+    ili9341_WriteData(0x00);
+    ili9341_WriteData(0x00);
+    ili9341_WriteData(0x06);
+#endif
 }
 
 /**

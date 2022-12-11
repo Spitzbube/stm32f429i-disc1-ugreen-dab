@@ -78,8 +78,8 @@
 /**
   * @brief  ILI9341 Size
   */
-#define  ILI9341_LCD_PIXEL_WIDTH    ((uint16_t)240)
-#define  ILI9341_LCD_PIXEL_HEIGHT   ((uint16_t)320)
+#define  ILI9341_LCD_PIXEL_WIDTH    ((uint16_t)320)
+#define  ILI9341_LCD_PIXEL_HEIGHT   ((uint16_t)240)
 
 /**
   * @brief  ILI9341 Timing
