@@ -138,6 +138,8 @@ int main(void)
 
   BSP_LCD_DrawHLine(50, 100, 150);
 
+  BSP_LCD_DisplayStringAtLine(1, "Hello World");
+
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -320,7 +322,7 @@ static void MX_LTDC_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN LTDC_Init 2 */
-
+  BSP_LCD_LayerDefaultInit(0, pLayerCfg.FBStartAdress);
   /* USER CODE END LTDC_Init 2 */
 
 }

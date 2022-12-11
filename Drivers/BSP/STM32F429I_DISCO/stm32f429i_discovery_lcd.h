@@ -29,9 +29,7 @@
 #include "stm32f429i_discovery.h"
 /* Include SDRAM Driver */
 #include "stm32f429i_discovery_sdram.h"
-#if 0
 #include "../../../Utilities/Fonts/fonts.h"
-#endif
 /* Include LCD component driver */
 #include "../Components/ili9341/ili9341.h"
 
@@ -61,9 +59,7 @@ typedef struct
 {
   uint32_t  TextColor;
   uint32_t  BackColor;
-#if 0
   sFONT     *pFont;
-#endif
 }LCD_DrawPropTypeDef;
 
 typedef struct

@@ -56,7 +56,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f429i_discovery_lcd.h"
-#if 0
 #include "../../../Utilities/Fonts/fonts.h"
 #include "../../../Utilities/Fonts/font24.c"
 #include "../../../Utilities/Fonts/font20.c"
@@ -100,7 +99,6 @@
 /**
   * @}
   */
-#endif
 
 /** @defgroup STM32F429I_DISCOVERY_LCD_Private_Variables STM32F429I DISCOVERY LCD Private Variables
   * @{
@@ -276,13 +274,13 @@ void BSP_LCD_LayerDefaultInit(uint16_t LayerIndex, uint32_t FB_Address)
   Layercfg.ImageHeight = BSP_LCD_GetYSize();
 
   HAL_LTDC_ConfigLayer(&LtdcHandler, &Layercfg, LayerIndex);
+#endif
 
   DrawProp[LayerIndex].BackColor = LCD_COLOR_WHITE;
-#if 0
   DrawProp[LayerIndex].pFont     = &Font24;
-#endif
   DrawProp[LayerIndex].TextColor = LCD_COLOR_BLACK;
 
+#if 0
   /* Dithering activation */
   HAL_LTDC_EnableDither(&LtdcHandler);
 #endif
@@ -513,6 +511,8 @@ void BSP_LCD_SetBackColor(uint32_t Color)
   DrawProp[ActiveLayer].BackColor = Color;
 }
 
+#endif
+
 /**
   * @brief  Sets the Text Font.
   * @param  pFonts: the layer font to be used
@@ -530,6 +530,8 @@ sFONT *BSP_LCD_GetFont(void)
 {
   return DrawProp[ActiveLayer].pFont;
 }
+
+#if 0
 
 /**
   * @brief  Reads Pixel.
@@ -578,8 +580,6 @@ void BSP_LCD_Clear(uint32_t Color)
   /* Clear the LCD */
   FillBuffer(ActiveLayer, (uint32_t *)(hltdc.LayerCfg[ActiveLayer].FBStartAdress), BSP_LCD_GetXSize(), BSP_LCD_GetYSize(), 0, Color);
 }
-
-#if 0
 
 /**
   * @brief  Clears the selected line.
@@ -678,8 +678,6 @@ void BSP_LCD_DisplayStringAtLine(uint16_t Line, uint8_t *ptr)
 {
   BSP_LCD_DisplayStringAt(0, LINE(Line), ptr, LEFT_MODE);
 }
-
-#endif
 
 /**
   * @brief  Displays an horizontal line.
@@ -1314,8 +1312,6 @@ __weak void BSP_LCD_MspInit(void)
 #endif
 }
 
-#if 0
-
 /*******************************************************************************
                             Static Functions
 *******************************************************************************/
@@ -1329,7 +1325,7 @@ __weak void BSP_LCD_MspInit(void)
 void BSP_LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint32_t RGB_Code)
 {
   /* Write data value to all SDRAM memory */
-  *(__IO uint32_t*) (LtdcHandler.LayerCfg[ActiveLayer].FBStartAdress + (4*(Ypos*BSP_LCD_GetXSize() + Xpos))) = RGB_Code;
+  *(__IO uint32_t*) (/*LtdcHandler*/hltdc.LayerCfg[ActiveLayer].FBStartAdress + (4*(Ypos*BSP_LCD_GetXSize() + Xpos))) = RGB_Code;
 }
 
 /**
@@ -1385,8 +1381,6 @@ static void DrawChar(uint16_t Xpos, uint16_t Ypos, const uint8_t *c)
     Ypos++;
   }
 }
-
-#endif
 
 /**
   * @brief  Fills buffer.
